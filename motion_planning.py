@@ -2,6 +2,7 @@ import argparse
 import time
 import msgpack
 from enum import Enum, auto
+import csv
 
 import numpy as np
 
@@ -120,12 +121,20 @@ class MotionPlanning(Drone):
         self.target_position[2] = TARGET_ALTITUDE
 
         # TODO: read lat0, lon0 from colliders into floating point values
+        with open('colliders.csv', newline='') as f:
+            reader = csv.reader(f)
+            row1 = next(reader)
+       
+        lat0 = np.float(row1[0].strip().split(' ')[1])
+        lon0 = np.float(row1[1].strip().split(' ')[1])
         
         # TODO: set home position to (lon0, lat0, 0)
+        self.set_home_position(lon0, lat0, 0)
 
         # TODO: retrieve current global position
- 
+
         # TODO: convert to current local position using global_to_local()
+        local_position = global_to_local(self.global_position, self.global_home)
         
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
@@ -138,7 +147,10 @@ class MotionPlanning(Drone):
         # Define starting point on the grid (this is just grid center)
         grid_start = (-north_offset, -east_offset)
         # TODO: convert start position to current position rather than map center
-        
+        grid_start_north = int(np.ceil(local_position[0] + grid_start[0]))
+        grid_start_east = int(np.ceil(local_position[1] + grid_start[1]))
+        grid_start = (grid_start_north, grid_start_east)
+
         # Set goal as some arbitrary position on the grid
         grid_goal = (-north_offset + 10, -east_offset + 10)
         # TODO: adapt to set goal as latitude / longitude position and convert
