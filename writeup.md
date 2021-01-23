@@ -15,4 +15,12 @@ In motion_planning.py the path is planned after arming and a new state has been 
 
 ## My Path Planning Algorithm
 
+https://www.maps.ie/coordinates.html   
+start   
+37.79248   
+-122.39745  
+
+goal   
+37.79173990062469   
+-122.39480316638947      
 
