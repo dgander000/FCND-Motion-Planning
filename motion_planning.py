@@ -6,7 +6,7 @@ import csv
 
 import numpy as np
 
-from planning_utils import a_star, heuristic, create_grid, prune_path
+from planning_utils import a_star, heuristic, create_grid, prune_path, plot_path
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -116,7 +116,7 @@ class MotionPlanning(Drone):
         self.flight_state = States.PLANNING
         print("Searching for a path ...")
         TARGET_ALTITUDE = 5
-        SAFETY_DISTANCE = 7
+        SAFETY_DISTANCE = 5
 
         self.target_position[2] = TARGET_ALTITUDE
 
@@ -157,9 +157,9 @@ class MotionPlanning(Drone):
         # Set goal as some arbitrary position on the grid
         grid_goal = (-north_offset + 10, -east_offset + 10)
         # TODO: adapt to set goal as latitude / longitude position and convert
-        # Goal - Starbucks
-        goal_lon = -122.39480316638947
-        goal_lat = 37.79173990062469
+        # Goal 
+        goal_lon = -122.40199327
+        goal_lat = 37.79245808
         goal_global_pos = global_to_local((goal_lon, goal_lat, 0), self.global_home)
         grid_goal_north = int(np.ceil(goal_global_pos[0] + grid_start[0]))
         grid_goal_east = int(np.ceil(goal_global_pos[1] + grid_start[1]))
@@ -173,6 +173,7 @@ class MotionPlanning(Drone):
         # TODO: prune path to minimize number of waypoints
         # TODO (if you're feeling ambitious): Try a different approach altogether!
         pruned_path = prune_path(path)
+        plot_path(grid, pruned_path, north_offset, east_offset, grid_start, grid_goal)
 
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in pruned_path]
@@ -200,7 +201,7 @@ if __name__ == "__main__":
     parser.add_argument('--host', type=str, default='127.0.0.1', help="host address, i.e. '127.0.0.1'")
     args = parser.parse_args()
 
-    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=60)
+    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=600)
     drone = MotionPlanning(conn)
     time.sleep(1)
 

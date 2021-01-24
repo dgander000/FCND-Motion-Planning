@@ -1,6 +1,7 @@
 from enum import Enum
 from queue import PriorityQueue
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def create_grid(data, drone_altitude, safety_distance):
@@ -179,3 +180,27 @@ def collinearity_prune(path, epsilon=1e-5):
 
 def prune_path(path):
     return collinearity_prune(path)
+
+def plot_path(grid, path, north_offset, east_offset, start, goal):
+    plt.imshow(grid, origin='lower', cmap='Greys') 
+
+    Xs = []
+    Ys = []
+    for point in path:
+        Xs.append(point[1])
+        Ys.append(point[0])
+    plt.plot(Xs, Ys, 'c', label='Path')
+
+    plt.plot(-east_offset, -north_offset, 'yx', label='Home')
+    plt.plot(start[1], start[0], 'ro', label='Start')
+    plt.plot(goal[1], goal[0], 'go', linewidth=4, label='Goal')
+
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+    textstr = 'north offset: ' + str(north_offset) + '  east offset: ' + str(east_offset)
+    plt.gcf().text(0.04, 0.02, textstr, fontsize=8)
+
+    plt.xlabel('East')
+    plt.ylabel('North')
+    plt.tight_layout()
+    plt.savefig('path.png')
